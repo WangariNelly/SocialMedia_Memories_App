@@ -2,18 +2,24 @@
 import PostMessage from '../models/postDetails.js';
 
 
-export const createPosts = async(req,res) => {
+export const getPosts = async(req,res) => {
   try{
-
     const postMessages = await PostMessage.find();
-    console.log(postMessages)
+    res.status(200).json(postMessages);
 
   } catch(err) {
-    console.log(err.message);
+    res.status(404).json({message:  err.message});
   }
 };
 
 
-export const getPosts = (req,res) => {
-    res.send("Response");
+export const createPosts =  async( req,res) => {
+const post = req.body;
+const newPost = new PostMessage(post);
+   try{
+   await newPost.save();
+   res.status(200).json(newPost);
+   }catch(err){
+    res.status(409).json({message:  err.message});
+   }
 };
