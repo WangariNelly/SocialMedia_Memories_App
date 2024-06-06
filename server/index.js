@@ -1,22 +1,37 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
-
 import postRoutes from './routes/posts.js';
+import connectDB from './db/connect.js';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+dotenv.config();
+const PORT = 5500;
 
 const app = express();
 
-//routes
-app.use('/posts',postRoutes)
-
+//Middlewares
 app.use(bodyParser.json({limit: "30mb", extended: true}));
 app.use(bodyParser.urlencoded({limit: "30mb", extended: true}));
 app.use(cors());
 
-const CONNECTION_URL = 'mongodb+srv://socialapp:socialapp123@cluster0.c68nn2j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const PORT = process.env.PORT || 5000;
+//routes
+app.use('/posts',postRoutes)
  
-mongoose.connect(CONNECTION_URL, { useNewUrlParser: true
-}).then (() => app.listen(PORT ,() => console.log(`Server running on ${PORT}...`)
-)).catch((err) => console.log(err.message));
+
+const connectToDatabase = async ()=> {
+    try{
+        await connectDB(process.env.MONGODB_URI,{
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useCreateIndex: true, 
+            useFindAndModify: false, 
+        });
+        app.listen(PORT,console.log(`Server running on ${PORT}...`))
+    } catch (err){
+        console.log(err.message)
+    }
+};
+connectToDatabase();
+
+
